@@ -7,11 +7,13 @@ import androidx.core.content.PermissionChecker;
 import androidx.fragment.app.FragmentManager;
 
 import android.Manifest;
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -24,10 +26,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.ArrayList;
 
-    Button btn1, btn2, btn3;
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+
+    Spinner spn;
     private GoogleMap map;
+    String[] places = {"North", "Central", "East"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +41,12 @@ public class MainActivity extends AppCompatActivity {
 
         FragmentManager fm = getSupportFragmentManager();
         SupportMapFragment mapFragment = (SupportMapFragment) fm.findFragmentById(R.id.map);
+
+        spn = (Spinner) findViewById(R.id.spinner);
+        spn.setOnItemSelectedListener(this);
+        ArrayAdapter aa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, places);
+        aa.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+        spn.setAdapter(aa);
 
         mapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
@@ -50,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
                 int permissionCheck = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION);
 
-                if (permissionCheck == PermissionChecker.PERMISSION_GRANTED){
+                if (permissionCheck == PermissionChecker.PERMISSION_GRANTED) {
                     map.setMyLocationEnabled(true);
                 } else {
                     Log.e("GMap - Permission", "GPS access has not been granted");
@@ -59,64 +70,53 @@ public class MainActivity extends AppCompatActivity {
 
                 LatLng poi_north = new LatLng(1.4484, 103.7790);
                 Marker n = map.addMarker(new MarkerOptions().position(poi_north).title("HQ - North").snippet("Block 333, Admiralty Ave 3, 765654 Operating hours: 10am - 5pm Tel: 65433456").icon(BitmapDescriptorFactory.fromResource(R.drawable.star)));
-                map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                    @Override
-                    public boolean onMarkerClick(Marker marker) {
-                        String title = marker.getTitle();
-                        if(title.equalsIgnoreCase("North - HQ")){
-                            Toast.makeText(getApplicationContext(), title, Toast.LENGTH_SHORT).show();
-                        } else if(title.equalsIgnoreCase("Central")){
-                            Toast.makeText(getApplicationContext(), title, Toast.LENGTH_SHORT).show();
-                        } else{
-                            Toast.makeText(getApplicationContext(), title, Toast.LENGTH_SHORT).show();
-                        }
-                        return false;
-                    }
-                });
 
                 LatLng poi_central = new LatLng(1.3048, 103.8318);
                 Marker c = map.addMarker(new MarkerOptions().position(poi_central).title("Central").snippet("Block 3A, Orchard Ave 3, 134542 Operating hours: 11am - 8pm Tel: 67788652").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
 
                 LatLng poi_east = new LatLng(1.3496, 103.9568);
                 Marker e = map.addMarker(new MarkerOptions().position(poi_east).title("East").snippet("Block 555, Tampines Ave 3, 287788 Operating hours: 9am - 5pm Tel: 66776677").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+
+                map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker) {
+                        String title = marker.getTitle();
+                        if (title.equalsIgnoreCase("North - HQ")) {
+                            Toast.makeText(getApplicationContext(), title, Toast.LENGTH_SHORT).show();
+                        } else if (title.equalsIgnoreCase("Central")) {
+                            Toast.makeText(getApplicationContext(), title, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getApplicationContext(), title, Toast.LENGTH_SHORT).show();
+                        }
+                        return false;
+                    }
+                });
             }
         });
+    }
 
-        btn1 = findViewById(R.id.btn1);
-        btn2 = findViewById(R.id.btn2);
-        btn3 = findViewById(R.id.btn3);
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        if (map != null) {
+            if (i == 0) {
+                Log.d("TAG", "onItemSelected: ");
+                LatLng poi_north = new LatLng(1.4484, 103.7790);
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(poi_north, 15));
 
-        btn1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (map != null){
-                    LatLng poi_north = new LatLng(1.4484, 103.7790);
-                    //Marker n = map.addMarker(new MarkerOptions().position(poi_north).title("HQ - North").snippet("Block 333, Admiralty Ave 3, 765654 Operating hours: 10am - 5pm Tel: 65433456").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(poi_north, 15));
-                }
-            }
-        });
+        } else if (i == 1) {
+            LatLng poi_central = new LatLng(1.3048, 103.8318);
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(poi_central, 15));
+        } else {
+            LatLng poi_east = new LatLng(1.3496, 103.9568);
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(poi_east, 15));
+        }
+    }
 
-        btn2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (map != null){
-                    LatLng poi_central = new LatLng(1.3048, 103.8318);
-                    //Marker c = map.addMarker(new MarkerOptions().position(poi_central).title("Central").snippet("Block 3A, Orchard Ave 3, 134542 Operating hours: 11am - 8pm Tel: 67788652").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
-                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(poi_central, 15));
-                }
-            }
-        });
+}
 
-        btn3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(map != null) {
-                    LatLng poi_east = new LatLng(1.3496, 103.9568);
-                    //Marker e = map.addMarker(new MarkerOptions().position(poi_east).title("East").snippet("Block 555, Tampines Ave 3, 287788 Operating hours: 9am - 5pm Tel: 66776677").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
-                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(poi_east, 15));
-                }
-            }
-        });
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
     }
 }
