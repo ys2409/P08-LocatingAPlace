@@ -7,10 +7,12 @@ import androidx.core.content.PermissionChecker;
 import androidx.fragment.app.FragmentManager;
 
 import android.Manifest;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -56,8 +58,21 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 LatLng poi_north = new LatLng(1.4484, 103.7790);
-
                 Marker n = map.addMarker(new MarkerOptions().position(poi_north).title("HQ - North").snippet("Block 333, Admiralty Ave 3, 765654 Operating hours: 10am - 5pm Tel: 65433456").icon(BitmapDescriptorFactory.fromResource(R.drawable.star)));
+                map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker) {
+                        String title = marker.getTitle();
+                        if(title.equalsIgnoreCase("North - HQ")){
+                            Toast.makeText(getApplicationContext(), title, Toast.LENGTH_SHORT).show();
+                        } else if(title.equalsIgnoreCase("Central")){
+                            Toast.makeText(getApplicationContext(), title, Toast.LENGTH_SHORT).show();
+                        } else{
+                            Toast.makeText(getApplicationContext(), title, Toast.LENGTH_SHORT).show();
+                        }
+                        return false;
+                    }
+                });
 
                 LatLng poi_central = new LatLng(1.3048, 103.8318);
                 Marker c = map.addMarker(new MarkerOptions().position(poi_central).title("Central").snippet("Block 3A, Orchard Ave 3, 134542 Operating hours: 11am - 8pm Tel: 67788652").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
